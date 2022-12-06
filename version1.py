@@ -5,7 +5,7 @@ with open("GermanSyllable\input.txt") as file:
 '''
 test = 'Silbentrennung Worttrennung Zerlegung schule Hauptgrundlage Himbeere hinter zusammengesetzter Muster Hamster fenster hinstellen katze witzlos krapfen über'
 # Kastrat and Foxtrott didn't pass the test (rule VtzV > Vt-zV and VCtzV > VCt-zV)
-
+test2 = 'Diät Auto Seeufer Katze Tatze Pfütze putzen platzen Bürste Kiste Hamster Fenster hinstellen darstellen erstarren plötzlich Postauto Kratzbaum boxen heben rodeln Schifffahrt Mussspiel wichtigsten' 
 # complex forms of vocals(V) and consonants(C)
 complexVC = {
     # check if it needs to be like this or just one V or C?

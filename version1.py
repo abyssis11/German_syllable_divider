@@ -3,9 +3,11 @@
 with open("GermanSyllable\input.txt") as file:
     l = [x for x in file.read().split(' ')]
 '''
-test = 'Silbentrennung Worttrennung Zerlegung schule Hauptgrundlage Himbeere hinter zusammengesetzter Muster Hamster fenster hinstellen katze witzlos krapfen über'
+#test = 'Silbentrennung Worttrennung Zerlegung schule Hauptgrundlage Himbeere hinter zusammengesetzter Muster Hamster fenster hinstellen katze witzlos krapfen über'
 # Kastrat and Foxtrott didn't pass the test (rule VtzV > Vt-zV and VCtzV > VCt-zV)
-test2 = 'Diät Auto Seeufer Katze Tatze Pfütze putzen platzen Bürste Kiste Hamster Fenster hinstellen darstellen erstarren plötzlich Postauto Kratzbaum boxen heben rodeln Schifffahrt Mussspiel wichtigsten' 
+test = 'Diät Auto Seeufer Katze Tatze Pfütze putzen platzen Bürste Kiste Hamster Fenster hinstellen darstellen erstarren plötzlich Postauto Kratzbaum boxen heben rodeln Schifffahrt Mussspiel wichtigsten Nationen Borretschgewächs' 
+#test = 'wichtigsten'
+
 # complex forms of vocals(V) and consonants(C)
 complexVC = {
     # check if it needs to be like this or just one V or C?
@@ -70,7 +72,7 @@ prefix=['unter', 'über', 'hinter', 'wider', 'wieder', 'weiter', 'zurück', 'zur
         'an', 'ab', 'in', 'um', 'un', 'ur', 'er', 'ex']
 
 # ARGUMENTS: list of syllables in the word and corresponding list of V and C
-def divider(syllableList, VClist):
+def divider(syllableList: list, VClist: list):
     acc=0
     # we will divide the word into syllables, 
     # each syllable will be one element in the list
@@ -86,6 +88,7 @@ def divider(syllableList, VClist):
 
         # rule VCCV --> VC-CV 
         if 'VCCV' in syllableVC:
+            #print('VCCV')
             # if a patter VCCV is in the syllable we divide it into two syllables
             sy1=syllable[:syllableVC.find('VCCV')+2]
             sy2=syllable[syllableVC.find('VCCV')+2:syllableVC.find('VCCV')+5]
@@ -120,11 +123,15 @@ def divider(syllableList, VClist):
         # all the other rules follow the same structure as the first rule
         # rule VCCCV --> VCC-CV
         elif 'VCCCV' in syllableVC:
+            #print('VCCCV')
+            l=3
             sy1=syllable[:syllableVC.find('VCCCV')+3]
-            sy2=syllable[syllableVC.find('VCCCV')+3:syllableVC.find('VCCCV')+6]
+            if len(sy1) == 4:
+                l=len(sy1)
+            sy2=syllable[syllableVC.find('VCCCV')+3:syllableVC.find('VCCCV')+3+l] # 6 NEEDS TO BE CALCULATED DIFFERENTLY
 
             sy1VC=syllableVC[:syllableVC.find('VCCCV')+3]
-            sy2VC=syllableVC[syllableVC.find('VCCCV')+3:syllableVC.find('VCCCV')+6]
+            sy2VC=syllableVC[syllableVC.find('VCCCV')+3:syllableVC.find('VCCCV')+3+l]
 
             syllable=syllable.replace(sy1+sy2,'')
             syllableVC=syllableVC.replace(sy1VC+sy2VC,'',1)
@@ -149,6 +156,7 @@ def divider(syllableList, VClist):
         # VCCCCV --> VCC-CCV
         # not a defined rule but I've noticed that it appears often
         elif 'VCCCCV' in syllableVC:
+            #print('VCCCCV')
             sy1=syllable[:syllableVC.find('VCCCCV')+3]
             sy2=syllable[syllableVC.find('VCCCCV')+3:syllableVC.find('VCCCCV')+7]
 
@@ -203,7 +211,38 @@ def divider(syllableList, VClist):
                 vclist.append(sy1VC)
                 vclist.append(sy2VC)
                 vclist.append(syllableVC)
-        
+
+        # Not a rule but add from observation 
+        # VV -> V-V
+        elif 'VV' in syllableVC and syllable[syllableVC.find('VV'):syllableVC.find('VV')+2] not in complexVC:
+            #print('VV')
+            sy1=syllable[:syllableVC.find('VV')+1]
+            sy2=syllable[syllableVC.find('VV')+1:]
+
+            sy1VC=syllableVC[:syllableVC.find('VV')+1]
+            sy2VC=syllableVC[syllableVC.find('VV')+1:]
+
+            syllable=syllable.replace(sy1+sy2,'')
+            syllableVC=syllableVC.replace(sy1VC+sy2VC,'',1)
+
+            if len(syllable)<3:
+                sy2+=syllable
+                wordlist.append(sy1)
+                wordlist.append(sy2)
+            else:
+                wordlist.append(sy1)
+                wordlist.append(sy2)
+                wordlist.append(syllable)
+
+            if len(syllableVC)<3:
+                sy2VC+=syllableVC
+                vclist.append(sy1VC)
+                vclist.append(sy2VC)
+            else:
+                vclist.append(sy1VC)
+                vclist.append(sy2VC)
+                vclist.append(syllableVC)
+            
         # Not implementet rules:
             # tsch rule ???
             # VstV > Vs-tV (BUT THE TEST CASES PASSED)
